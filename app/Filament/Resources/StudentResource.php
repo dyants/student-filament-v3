@@ -22,10 +22,10 @@ use Filament\Tables\Actions\BulkAction;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\StudentsExport;
 use App\Imports\StudentsImport;
+use App\Models\Classes;
 use Illuminate\Support\Collection;
 use Filament\Actions\ImportAction;
-
-// use function Laravel\Prompts\select;
+use Filament\Tables\Filters\Filter;
 
 class StudentResource extends Resource
 {
@@ -84,7 +84,15 @@ class StudentResource extends Resource
 
             ])
             ->filters([
-                //
+                Filter::make('class-section-filter')
+                ->form([
+                    Select::make('class_id')
+                        ->label('Filter by Class')
+                        ->placeholder('Select a Class')
+                        ->options(
+                            Classes::pluck('name', 'id')->toArray(),
+                        )
+                ]),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -94,7 +102,7 @@ class StudentResource extends Resource
                     Tables\Actions\DeleteBulkAction::make(),
                     BulkAction::make('export')
                     ->label('Export to Excel')
-                    ->icon('heroicon-o-arrow-down-tray')
+                    ->icon('heroicon-o-document-arrow-down')
                     ->action(function(Collection $records) {
                          return Excel::download(new StudentsExport($records), 'students.xlsx');
                     })
