@@ -42,7 +42,11 @@ class SectionResource extends Resource
             ->columns([
                 TextColumn::make('name'),
                 TextColumn::make('class.name')
-                ->badge(),
+                    ->badge(),
+
+                TextColumn::make('students_count')
+                    ->counts('students')
+                    ->badge(),
             ])
             ->filters([
                 //

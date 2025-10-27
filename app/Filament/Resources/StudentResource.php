@@ -26,6 +26,7 @@ use App\Models\Classes;
 use Illuminate\Support\Collection;
 use Filament\Actions\ImportAction;
 use Filament\Tables\Filters\Filter;
+use Illuminate\Support\Arr;
 
 class StudentResource extends Resource
 {
@@ -91,8 +92,26 @@ class StudentResource extends Resource
                         ->placeholder('Select a Class')
                         ->options(
                             Classes::pluck('name', 'id')->toArray(),
-                        )
-                ]),
+                        ),
+
+                    Select::make('section_id')
+                        ->label('Filter by Section')
+                        ->placeholder('Select a Section')
+                        ->options(function(Get $get){
+                            $classId = $get('class_id');
+                            if ($classId) {
+                                return Section::where('class_id', $classId)
+                                ->pluck('name', 'id')->toArray();
+                            }
+                        }),             
+                    ])
+                    ->query(function (Builder $query,array $data): Builder {
+                        return $query->when($data['class_id'], function($query) use($data) {
+                            return $query->where('class_id', $data['class_id']);
+                        })->when($data['section_id'], function($query) use($data) {
+                            return $query->where('section_id', $data['section_id']);
+                        });
+                }),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
