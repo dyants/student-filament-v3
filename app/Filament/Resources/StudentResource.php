@@ -9,11 +9,23 @@ use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
+use App\Models\Section;
+use Filament\Forms\Components\Select;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Forms\Get;
 use App\Filament\Resources\StudentResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\StudentResource\RelationManagers;
 use Filament\Forms\Components\TextInput;
+use Filament\Tables\Actions\BulkAction;
+// dibawah ini record exel export ditambahkan
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\StudentsExport;
+use App\Imports\StudentsImport;
+use Illuminate\Support\Collection;
+use Filament\Actions\ImportAction;
+
+// use function Laravel\Prompts\select;
 
 class StudentResource extends Resource
 {
@@ -25,6 +37,22 @@ class StudentResource extends Resource
     {
         return $form
             ->schema([
+                 Select::make('class_id')
+                    ->live()
+                    ->relationship(name: 'class', titleAttribute: 'name'),
+
+                    Select::make('section_id')
+                    ->label('Section')
+                    ->options(function (Get $get) {
+                        $classId = $get('class_id');
+
+                        
+                        if ($classId) {
+                            return Section::where('class_id', $classId)->pluck
+                            ('name', 'id')->toArray();
+                        }
+                    }),
+
                 TextInput::make('name')
                     ->autofocus()
                     ->required(),
@@ -64,6 +92,12 @@ class StudentResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    BulkAction::make('export')
+                    ->label('Export to Excel')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->action(function(Collection $records) {
+                         return Excel::download(new StudentsExport($records), 'students.xlsx');
+                    })
                 ]),
             ]);
     }
