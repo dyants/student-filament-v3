@@ -32,7 +32,16 @@ class StudentResource extends Resource
 {
     protected static ?string $model = Student::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
+
+    // Navigation group for the resource
+    protected static ?string $navigationGroup = 'Academic Management';
+
+    // Get the number of students for navigation badge
+    public static function getNavigationBadge(): ?string
+    {
+        return static::$model::count();
+    }
 
     public static function form(Form $form): Form
     {
@@ -105,6 +114,7 @@ class StudentResource extends Resource
                             }
                         }),             
                     ])
+                    // Apply the filter to the query
                     ->query(function (Builder $query,array $data): Builder {
                         return $query->when($data['class_id'], function($query) use($data) {
                             return $query->where('class_id', $data['class_id']);

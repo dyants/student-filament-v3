@@ -21,11 +21,17 @@ class ClassesResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    // Navigation group for the resource
+    protected static ?string $navigationGroup = 'Academic Management';
+
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                TextInput::make('name'),
+                TextInput::make('name')
+                ->required()
+                ->unique(ignoreRecord: true), // menggunaka n unique untuk memastikan nama kelas unik
             ]);
     }
 

@@ -16,6 +16,8 @@ use App\Filament\Resources\SectionResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\SectionResource\RelationManagers;
 use Dom\Text;
+use Illuminate\Validation\Rules\Unique;
+use Filament\Forms\Get;
 
 use function Laravel\Prompts\select;
 
@@ -25,6 +27,9 @@ class SectionResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    // Navigation group for the resource
+    protected static ?string $navigationGroup = 'Academic Management';
+
     public static function form(Form $form): Form
     {
         return $form
@@ -32,7 +37,10 @@ class SectionResource extends Resource
                 select::make('class_id')
                     ->relationship(name: 'class', titleAttribute: 'name'),
 
-                TextInput::make('name'),
+                TextInput::make('name')
+                    ->unique(ignoreRecord: true, modifyRuleUsing: function (Get $get, Unique $rule) {
+                        return $rule->where('class_id', $get('class_id'));
+                    }),
             ]);
     }
 

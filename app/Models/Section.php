@@ -20,11 +20,13 @@ class Section extends Model
         return $this->belongsTo(Classes::class);
     }
 
+    // relation to student model
     public function student()
     {
         return $this->hasMany(Student::class);
     }
 
+    // relation to student model
     public function students()
     {
         return $this->hasMany(Student::class, 'section_id');
