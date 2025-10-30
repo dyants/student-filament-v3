@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use Filament\Forms;
 use Filament\Tables;
 use App\Models\Student;
+
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
@@ -27,6 +28,7 @@ use Illuminate\Support\Collection;
 use Filament\Actions\ImportAction;
 use Filament\Tables\Filters\Filter;
 use Illuminate\Support\Arr;
+use Filament\Tables\Actions\Action;
 
 class StudentResource extends Resource
 {
@@ -124,6 +126,9 @@ class StudentResource extends Resource
                 }),
             ])
             ->actions([
+                Action::make('downloadPdf')->url(function (Student $student) {
+                    return route('students.invoice.generate', $student);
+                }),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
